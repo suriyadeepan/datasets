@@ -1,0 +1,4 @@
+test.enc filter=lfs diff=lfs merge=lfs -text
+train.enc filter=lfs diff=lfs merge=lfs -text
+test.dec filter=lfs diff=lfs merge=lfs -text
+train.dec filter=lfs diff=lfs merge=lfs -text
