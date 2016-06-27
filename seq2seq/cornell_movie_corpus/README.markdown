@@ -1,4 +1,4 @@
-# Cornell Movie Dialogs Corpus](http://www.cs.cornell.edu/~cristian/Cornell_Movie-Dialogs_Corpus.html)
+# [Cornell Movie Dialogs Corpus](http://www.cs.cornell.edu/~cristian/Cornell_Movie-Dialogs_Corpus.html)
 
 > This corpus contains a large metadata-rich collection of fictional conversations extracted from raw movie scripts:
 
