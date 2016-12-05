@@ -1,11 +1,21 @@
 import random
+import os
+
+''' 
+    Linux utf-8 fix
+    Original script fails on python 3 because file encoding was ANSI and some parts like print was on python 2 format so lets fix that
+    Works only on linux(?) so find out how to convert iso-8859-1 to utf-8 on your platform
+'''
+def we_need_to_go_utf8(): 
+    os.system('iconv -o utf8_movie_lines.txt -f iso-8859-1 -t utf-8 movie_lines.txt')
+    os.system('iconv -o utf8_movie_conversations.txt -f iso-8859-1 -t utf-8 movie_conversations.txt')
 
 ''' 
     1. Read from 'movie-lines.txt'
     2. Create a dictionary with ( key = line_id, value = text )
 '''
 def get_id2line():
-    lines=open('movie_lines.txt').read().split('\n')
+    lines=open('utf8_movie_lines.txt').read().split('\n')
     id2line = {}
     for line in lines:
         _line = line.split(' +++$+++ ')
@@ -18,7 +28,7 @@ def get_id2line():
     2. Create a list of [list of line_id's]
 '''
 def get_conversations():
-    conv_lines = open('movie_conversations.txt').read().split('\n')
+    conv_lines = open('utf8_movie_conversations.txt').read().split('\n')
     convs = [ ]
     for line in conv_lines[:-1]:
         _line = line.split(' +++$+++ ')[-1][1:-1].replace("'","").replace(" ","")
@@ -85,8 +95,8 @@ def prepare_seq2seq_files(questions, answers, path='',TESTSET_SIZE = 30000):
         else:
             train_enc.write(questions[i]+'\n')
             train_dec.write(answers[i]+ '\n' )
-        if i%10000 == 0:
-            print '\n>> written %d lines' %(i) 
+#        if i%10000 == 0:
+#            print(R'\n>> written "%s" lines') %(i) 
 
     # close files
     train_enc.close()
@@ -99,11 +109,14 @@ def prepare_seq2seq_files(questions, answers, path='',TESTSET_SIZE = 30000):
 # main()
 ####
 
+print('>> converting files to utf-8.\n')
+we_need_to_go_utf8()
+
 id2line = get_id2line()
-print '>> gathered id2line dictionary.\n'
+print('>> gathered id2line dictionary.\n')
 convs = get_conversations()
-print '>> gathered conversations.\n'
+print('>> gathered conversations.\n')
 questions, answers = gather_dataset(convs,id2line)
-print questions[:2]
-#print '>> gathered questions and answers.\n'
-#prepare_seq2seq_files(questions,answers)
+print(questions[:2])
+print('>> gathered questions and answers.\n')
+prepare_seq2seq_files(questions,answers)
