@@ -19,8 +19,8 @@
 
 ## Processed Data
 
-The processed data can be downloaded by running pull\_data.sh.
+The processed data can be downloaded by running **pull\_data.sh**
 
 ```bash
-bash pull_data.sh
+./pull_data.sh
 ```
