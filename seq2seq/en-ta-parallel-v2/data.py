@@ -7,7 +7,7 @@ FILENAME = { 'dev' : { 'en' : 'data/corpus.bcn.dev.en', 'ta' : 'data/corpus.bcn.
            }
 
 limit = {
-        'maxta' : 15,
+        'maxta' : 20,
         'minta' : 5,
         'maxen' : 40,
         'minen' : 10
@@ -169,7 +169,7 @@ def process_data():
 
     # indexing -> idx2w, w2idx : en/ta
     print('\n >> Index words')
-    vocab_en, idx2w_en, w2idx_en = index_(dev_en_w, vocab_size=1500)
+    vocab_en, idx2w_en, w2idx_en = index_(dev_en_w, vocab_size=10000)
     _, idx2ch_ta, ch2idx_ta = index_(dev_ta_lines, vocab_size=None)
 
     print('\n >> Zero Padding')
