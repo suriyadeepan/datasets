@@ -7,13 +7,13 @@ FILENAME = { 'dev' : { 'en' : 'data/corpus.bcn.dev.en', 'ta' : 'data/corpus.bcn.
            }
 
 limit = {
-        'maxta' : 30,
+        'maxta' : 25,
         'minta' : 5,
-        'maxph' : 16,
-        'minph' : 5
+        'maxen' : 40,
+        'minen' : 10
         }
 
-UNK = '_'
+UNK = 'unk'
 
 
 import random
@@ -21,12 +21,15 @@ import sys
 
 import nltk
 import itertools
+from collections import defaultdict
 
 import numpy as np
 
 import pickle
 
 
+def ddefault():
+    return 1
 
 '''
  read lines from file
@@ -58,9 +61,9 @@ def index_(tokenized_sentences, vocab_size):
     # get vocabulary of 8000 most used words
     vocab = freq_dist.most_common(vocab_size)
     # index2word
-    index2word = [UNK] + [ x[0] for x in vocab ]
+    index2word = ['_'] + [UNK] + [ x[0] for x in vocab ]
     # word2index
-    word2index = dict( [(w,i) for i,w in enumerate(index2word)] )
+    word2index = defaultdict( ddefault, [(w,i) for i,w in enumerate(index2word)] )
     return vocab, index2word, word2index
 
 '''
@@ -74,11 +77,68 @@ def index_(tokenized_sentences, vocab_size):
 
 
 
+'''
+ filter too long and too short sequences
+    return tuple( filtered_ta, filtered_en )
+
+'''
+def filter_data(taseq, enseq):
+    filtered_ta, filtered_en = [], []
+    raw_data_len = len(taseq) # 1000
+
+    for taline, enline in zip(taseq, enseq):
+        talen, enlen = len(taline.split(' ')), len(enline.split(' '))
+        if talen >= limit['minta'] and talen <= limit['maxta']:
+            if enlen >= limit['minen'] and enlen <= limit['maxen']:
+                filtered_ta.append(taline)
+                filtered_en.append(enline)
+
+    # print the fraction of the original data, filtered
+    filt_data_len = len(filtered_ta)
+    filtered = int((raw_data_len - filt_data_len)*100/raw_data_len)
+    print(str(filtered) + '% filtered from original data')
+
+    return filtered_ta, filtered_en
+
+
+
+
+
+'''
+ create the final dataset : 
+  - convert list of items to arrays of indices
+  - add zero padding
+      return ( [array_en([indices]), array_ta([indices]) )
+ 
+'''
+def zero_pad(talines, en_words, ch2idx_ta, w2idx_en):
+    # num of rows
+    data_len = len(talines)
+    # need character sequence length for ta
+    taseq_len = max([len(line) for line in talines])
+    limit['maxta'] = taseq_len
+    # numpy arrays to store indices
+    idx_ta = np.zeros([data_len, taseq_len], dtype=np.int32) # use character seq len
+    idx_en = np.zeros([data_len, limit['maxen']], dtype=np.int32) # use num words 
+
+    for i in range(data_len):
+        ta_indices = [ ch2idx_ta[ch] for ch in talines[i] ] \
+                            + [0]* (taseq_len - len(talines[i]))
+        en_indices  = [ w2idx_en[word] for word in en_words[i] ] \
+                            + [0]*(limit['maxen'] - len(en_words[i]))
+
+        idx_ta[i] = np.array(ta_indices)
+        idx_en[i] = np.array(en_indices)
+
+    return idx_ta, idx_en
+
+
+
 def process_data():
 
     print('\n>> Read lines from file')
-    dev_ta_lines = read_lines(filename=FILENAME['dev']['ta'])
-    dev_en_lines = read_lines(filename=FILENAME['dev']['en'])
+    dev_ta_lines = read_lines(filename=FILENAME['train']['ta'])
+    dev_en_lines = read_lines(filename=FILENAME['train']['en'])
 
     # change to lower case (just for en)
     dev_en_lines = [ line.lower() for line in dev_en_lines ]
@@ -94,7 +154,8 @@ def process_data():
     print('\n:: Sample from filtered lines')
     print(dev_ta_lines[121:125])
     print(dev_en_lines[121:125])
-
+    print('\n>> 2nd layer of filtering')
+    dev_ta_lines, dev_en_lines = filter_data(dev_ta_lines, dev_en_lines)
 
     # convert list of [lines of text] into list of [list of words ]
     print('\n>> Segment lines into words')
@@ -108,26 +169,26 @@ def process_data():
     vocab_en, idx2w_en, w2idx_en = index_(dev_en_w, vocab_size=1500)
     _, idx2ch_ta, ch2idx_ta = index_(dev_ta_lines, vocab_size=None)
 
+    print('\n >> Zero Padding')
+    idx_ta, idx_en = zero_pad(dev_ta_lines, dev_en_w, ch2idx_ta, w2idx_en)
+
+    print('\n >> Save numpy arrays to disk')
+    # save them
+    np.save('idx_ta.npy', idx_ta)
+    np.save('idx_en.npy', idx_en)
+
+    # let us now save the necessary dictionaries
+    data_ctl = {
+            'idx2ch_ta' : idx2ch_ta,
+            'idx2w_en' : idx2w_en,
+            'ch2idx_ta' : ch2idx_ta,
+            'w2idx_en' : w2idx_en,
+            'limit' : limit
+                }
+    # write to disk : data control dictionaries
+    with open('data_ctl.pkl', 'wb') as f:
+        pickle.dump(data_ctl, f)
+
  
 if __name__ == '__main__':
     process_data()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
