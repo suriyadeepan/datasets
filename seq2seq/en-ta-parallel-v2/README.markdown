@@ -11,6 +11,10 @@ Download raw data from [here](http://ufal.mff.cuni.cz/~ramasamy/parallel/data/v2
 
 Processed data is available [here]()
 
+## Remarks
+
+- Tokenizing tamil words and learning sentences word by word, is a ridiculous idea. In tamil, each word is fused to the next with a contextual modifier. So I am gonna try to generate sentences character by character, which seems just as preposterous.
+
 
 ## Citation
 
