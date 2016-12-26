@@ -7,7 +7,7 @@ FILENAME = { 'dev' : { 'en' : 'data/corpus.bcn.dev.en', 'ta' : 'data/corpus.bcn.
            }
 
 limit = {
-        'maxta' : 25,
+        'maxta' : 15,
         'minta' : 5,
         'maxen' : 40,
         'minen' : 10
@@ -63,7 +63,7 @@ def index_(tokenized_sentences, vocab_size):
     # index2word
     index2word = ['_'] + [UNK] + [ x[0] for x in vocab ]
     # word2index
-    word2index = defaultdict( ddefault, [(w,i) for i,w in enumerate(index2word)] )
+    word2index = dict([(w,i) for i,w in enumerate(index2word)] )
     return vocab, index2word, word2index
 
 '''
@@ -121,10 +121,13 @@ def zero_pad(talines, en_words, ch2idx_ta, w2idx_en):
     idx_ta = np.zeros([data_len, taseq_len], dtype=np.int32) # use character seq len
     idx_en = np.zeros([data_len, limit['maxen']], dtype=np.int32) # use num words 
 
+    # create a default dictionary
+    w2idx_en_dd = defaultdict(lambda : 1, w2idx_en)
+
     for i in range(data_len):
         ta_indices = [ ch2idx_ta[ch] for ch in talines[i] ] \
                             + [0]* (taseq_len - len(talines[i]))
-        en_indices  = [ w2idx_en[word] for word in en_words[i] ] \
+        en_indices  = [ w2idx_en_dd[word] for word in en_words[i] ] \
                             + [0]*(limit['maxen'] - len(en_words[i]))
 
         idx_ta[i] = np.array(ta_indices)
@@ -189,6 +192,15 @@ def process_data():
     with open('data_ctl.pkl', 'wb') as f:
         pickle.dump(data_ctl, f)
 
- 
+def load_data(PATH=''):
+    # read data control dictionaries
+    with open(PATH + 'data_ctl.pkl', 'rb') as f:
+        data_ctl = pickle.load(f)
+    # read numpy arrays
+    idx_ta = np.load(PATH + 'idx_ta.npy')
+    idx_en = np.load(PATH + 'idx_en.npy')
+    return data_ctl, idx_ta, idx_en
+
+
 if __name__ == '__main__':
     process_data()
