@@ -13,10 +13,17 @@ limit = {
         'minph' : 5
         }
 
+UNK = '_'
+
 
 import random
 import sys
+
+import nltk
+import itertools
+
 import numpy as np
+
 import pickle
 
 
@@ -24,6 +31,7 @@ import pickle
 '''
  read lines from file
      return [list of lines]
+
 '''
 def read_lines(filename):
     return open(filename).read().split('\n')[:-1]
@@ -41,17 +49,27 @@ def filter_line(line, blacklist):
 '''
  read list of words, create index to word,
   word to index dictionaries
-    return tuple( idx2w, w2idx )
+    return tuple( vocab->(word, count), idx2w, w2idx )
 
 '''
-def index_words(word_lists):
-    wvocab = set([word for words in word_lists 
-        for word in words]) # yeah, good luck reading that
-    idx2w = dict(enumerate(['_'] + sorted(list(wvocab))))
-    # we add an extra dummy element to make sure 
-    #  we dont touch the zero index (zero padding)
-    w2idx = dict(zip(idx2w.values(), idx2w.keys()))
-    return idx2w, w2idx
+def index_(tokenized_sentences, vocab_size):
+    # get frequency distribution
+    freq_dist = nltk.FreqDist(itertools.chain(*tokenized_sentences))
+    # get vocabulary of 8000 most used words
+    vocab = freq_dist.most_common(vocab_size)
+    # index2word
+    index2word = [UNK] + [ x[0] for x in vocab ]
+    # word2index
+    word2index = dict( [(w,i) for i,w in enumerate(index2word)] )
+    return vocab, index2word, word2index
+
+'''
+ collect all the tamil characters,
+  create i2ch and ch2i
+    return tuple( idx2ch, ch2idx )
+
+'''
+#def index_tamil(ta_sentences, vocab_size):
 
 
 
@@ -77,27 +95,18 @@ def process_data():
     print(dev_ta_lines[121:125])
     print(dev_en_lines[121:125])
 
+
     # convert list of [lines of text] into list of [list of words ]
     print('\n>> Segment lines into words')
-    dev_ta_w = [ wordlist.split(' ') for wordlist in dev_ta_lines ]
+    #dev_ta_w = [ wordlist.split(' ') for wordlist in dev_ta_lines ]
     dev_en_w = [ wordlist.split(' ') for wordlist in dev_en_lines ]
     print('\n:: Sample from segmented list of words')
-    print(dev_ta_w[121:125])
     print(dev_en_w[121:125])
 
     # indexing -> idx2w, w2idx : en/ta
     print('\n >> Index words')
-    idx2w_ta, w2idx_ta = index_words(dev_ta_w)
-    idx2w_en, w2idx_en = index_words(dev_en_w)
-    print('\n:: random.choice(idx2w)')
-    print(idx2w_ta[random.choice(list(idx2w_ta.keys()))])
-    print(idx2w_en[random.choice(list(idx2w_en.keys()))])
-    print('\n:: random.choice(w2idx)')
-    print(w2idx_ta[random.choice(list(w2idx_ta.keys()))])
-    print(w2idx_en[random.choice(list(w2idx_en.keys()))])
-
-    print(len(idx2w_ta.keys()))
-    print(len(idx2w_en.keys()))
+    vocab_en, idx2w_en, w2idx_en = index_(dev_en_w, vocab_size=1500)
+    _, idx2ch_ta, ch2idx_ta = index_(dev_ta_lines, vocab_size=None)
 
  
 if __name__ == '__main__':
