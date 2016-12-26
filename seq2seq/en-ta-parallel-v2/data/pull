@@ -1,0 +1,3 @@
+#!/bin/bash
+
+wget -c 'http://ufal.mff.cuni.cz/~ramasamy/parallel/data/v2/en-ta-parallel-v2.tar.gz'
