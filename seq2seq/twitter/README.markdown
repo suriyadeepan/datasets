@@ -7,5 +7,10 @@ Download from [here](https://raw.githubusercontent.com/Marsan-Ma/chat_corpus/mas
 ## Processing
 
 ```bash
+cd data
+./pull
+# now extract the .txt.gz file
+#  i'm lazy
+cd ..
 python3 data.py
 ```
