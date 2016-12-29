@@ -14,3 +14,14 @@ cd data
 cd ..
 python3 data.py
 ```
+
+## Processed Data
+
+- [seq2seq.twitter.tar.gz](https://www.dropbox.com/s/a091opu8dhdx1lu/seq2seq.twitter.tar.gz?dl=0)
+	- idx\_q.npy
+	- idx\_a.npy
+	- metadata.pkl
+		- w2idx
+		- idx2w
+		- limit : { maxq, minq, maxa, mina }
+		- freq_dist
