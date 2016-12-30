@@ -41,6 +41,16 @@ def read_lines(filename):
 
 
 '''
+ split sentences in one line
+  into multiple lines
+    return [list of lines]
+
+'''
+def split_line(line):
+    return line.split('.')
+
+
+'''
  remove anything that isn't in the vocabulary
     return str(pure ta/en)
 
@@ -65,6 +75,7 @@ def index_(tokenized_sentences, vocab_size):
     # word2index
     word2index = dict([(w,i) for i,w in enumerate(index2word)] )
     return vocab, index2word, word2index
+
 
 '''
  collect all the tamil characters,
