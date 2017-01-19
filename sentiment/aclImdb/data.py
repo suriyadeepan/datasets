@@ -105,7 +105,30 @@ def pad_seq(seq, lookup, maxlen):
 
 
 def process_data():
-    lines = read_files(DATA_PATH_POS[0])
+
+    lines = []
+    pos_lines = []
+    neg_lines = []
+    
+    print('>> Read positive reviews')
+    for path in DATA_PATH_POS:
+        print('>> Reading from '+ path)
+        pos_lines.extend(read_files(path))
+
+    print('>> Read negative reviews')
+    for path in DATA_PATH_NEG:
+        print('>> Reading from '+ path)
+        neg_lines.extend(read_files(path))
+
+    print('>> Prepare Y')
+    idx_y = np.array([0]*len(pos_lines) + [1]*len(neg_lines), dtype=np.int32)
+    print(':: len(y) : {}'.format(idx_y.shape))
+
+    print('>> Add reviews to data')
+    lines.extend(pos_lines)
+    lines.extend(neg_lines)
+
+
     print('>> {} lines read!'.format(len(lines)))
     # filter out unnecessary symbols
     lines = [ filter_line(line, EN_WHITELIST) for line in lines ]
@@ -114,11 +137,12 @@ def process_data():
     # index words
     idx2w, w2idx, freq_dist = index_(lines, vocab_size=VOCAB_SIZE)
     # zero padding
-    idx_data = zero_pad(lines, w2idx, max_words)
+    idx_x = zero_pad(lines, w2idx, max_words)
 
     print('\n >> Save numpy arrays to disk')
     # save them
-    np.save('idx_data.npy', idx_data)
+    np.save('idx_x.npy', idx_x)
+    np.save('idx_y.npy', idx_y)
 
     # let us now save the necessary dictionaries
     metadata = {
