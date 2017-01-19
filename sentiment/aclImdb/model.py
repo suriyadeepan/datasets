@@ -101,9 +101,9 @@ class SentiRNN(object):
                         saver.save(sess, self.ckpt_path + self.model_name + '.ckpt', global_step=i)
 
                         # stop condidtion
-                        if (train_loss/1000) < 0.5:
-                            print('\n>> Loss {}; Stopping training here at iteration #{}!!'.format(train_loss/1000, i))
-                            break
+                        #if (train_loss/1000) < 0.5:
+                        #    print('\n>> Loss {}; Stopping training here at iteration #{}!!'.format(train_loss/1000, i))
+                        #    break
 
                         train_loss = 0
 
