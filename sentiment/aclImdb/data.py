@@ -160,3 +160,15 @@ def process_data():
 
 if __name__ == '__main__':
     process_data()
+
+def load_data(PATH=''):
+    # read data control dictionaries
+    with open(PATH + 'metadata.pkl', 'rb') as f:
+        metadata = pickle.load(f)
+    # read numpy arrays
+    idx_x = np.load(PATH + 'idx_x.npy')
+    idx_y = np.load(PATH + 'idx_y.npy')
+    return metadata, idx_x, idx_y
+
+
+
