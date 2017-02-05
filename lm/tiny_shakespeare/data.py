@@ -3,14 +3,6 @@ EN_BLACKLIST = '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~\''
 
 FILENAME = 'input.txt'
 
-limit = {
-        'maxq' : 20,
-        'minq' : 0,
-        'maxa' : 20,
-        'mina' : 3
-        }
-
-UNK = 'unk'
 VOCAB_SIZE = 8000
 
 SEQ_LEN = 10
@@ -19,16 +11,10 @@ import random
 import sys
 
 import nltk
-import itertools
-from collections import defaultdict
 
 import numpy as np
 
 import pickle
-
-
-def ddefault():
-    return 1
 
 '''
  read lines from file
@@ -129,8 +115,6 @@ def process_data():
     #
     # convert to ndarray
     X, Y = to_array(tokenized, SEQ_LEN, w2idx)
-
-    print(X[3], Y[3])
 
     print('\n >> Save numpy arrays to disk')
     # save them
