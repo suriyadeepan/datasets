@@ -5,7 +5,7 @@ import random
     2. Create a dictionary with ( key = line_id, value = text )
 '''
 def get_id2line():
-    lines=open('movie_lines.txt').read().split('\n')
+    lines=open('movie_lines.txt').readlines()
     id2line = {}
     for line in lines:
         _line = line.split(' +++$+++ ')
@@ -18,7 +18,7 @@ def get_id2line():
     2. Create a list of [list of line_id's]
 '''
 def get_conversations():
-    conv_lines = open('movie_conversations.txt').read().split('\n')
+    conv_lines = open('movie_conversations.txt').readlines()
     convs = [ ]
     for line in conv_lines[:-1]:
         _line = line.split(' +++$+++ ')[-1][1:-1].replace("'","").replace(" ","")
